@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
- 
+
 #載入LineBot所需要的套件
 from flask import Flask, request, abort
- 
+
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -12,32 +12,32 @@ from linebot.exceptions import (
 from linebot.models import *
 import re
 app = Flask(__name__)
- 
+
 # 必須放上自己的Channel Access Token
 line_bot_api = LineBotApi('v4RM7HE6IQgn3qnZHXzzqyVrFSbgavcsFSMMrLSvAgrMrEbfw1TxEkRxy5oL1eHWMgViZfL4ODEDHEFHnc6eybTaSppOwPz+FENHPQBUxf/jYf7wnD8DvNHQ6A4SzyYYduQPfFhgnH7kxNfXTrL8/wdB04t89/1O/w1cDnyilFU=')
 # 必須放上自己的Channel Secret
 handler = WebhookHandler('e6286138006f5c8b930b5a34a55d888c')
- 
+
 line_bot_api.push_message('U1f4ec84ceb6d969223fd6ce05a1cc15b', TextSendMessage(text='你可以開始了'))
- 
+
 # 監聽所有來自 /callback 的 Post Request
 @app.route("/callback", methods=['POST'])
 def callback():
     # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
- 
+
     # get request body as text
     body = request.get_data(as_text=True)
     app.logger.info("Request body: " + body)
- 
+
     # handle webhook body
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
         abort(400)
- 
+
     return 'OK'
- 
+
 #訊息傳遞區塊
 ##### 基本上程式編輯都在這個function #####
 @handler.add(MessageEvent, message=TextMessage)
@@ -83,5 +83,3 @@ import os
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
- 
- 
