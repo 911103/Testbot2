@@ -10,16 +10,15 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import *
-
+import re
 app = Flask(__name__)
 
 # 必須放上自己的Channel Access Token
-line_bot_api = LineBotApi('eVAHESVfOWguGISa+Ye8fNAWOUGAJ75syoKXrZ3/N8Avz4Dc0pw8hA100mf4xzUXq8SCBb61SUz9/xdYy3UCHev+kXA2QznzDeQf53B0CWDgLb8l4+rMBoLsEsWVGzyp01NUQTJFHAD7l8leF4NrmAdB04t89/1O/w1cDnyilFU=')
-
+line_bot_api = LineBotApi('v4RM7HE6IQgn3qnZHXzzqyVrFSbgavcsFSMMrLSvAgrMrEbfw1TxEkRxy5oL1eHWMgViZfL4ODEDHEFHnc6eybTaSppOwPz+FENHPQBUxf/jYf7wnD8DvNHQ6A4SzyYYduQPfFhgnH7kxNfXTrL8/wdB04t89/1O/w1cDnyilFU=')
 # 必須放上自己的Channel Secret
-handler = WebhookHandler('564b63836ccb1084a63387b47d24f43a')
+handler = WebhookHandler('e6286138006f5c8b930b5a34a55d888c')
 
-line_bot_api.push_message('U8b2d0e1e226d3a7b6f65d59339b61481', TextSendMessage(text='你可以開始了'))
+line_bot_api.push_message('U1f4ec84ceb6d969223fd6ce05a1cc15b', TextSendMessage(text='你可以開始了'))
 
 # 監聽所有來自 /callback 的 Post Request
 @app.route("/callback", methods=['POST'])
@@ -43,9 +42,42 @@ def callback():
 ##### 基本上程式編輯都在這個function #####
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    message = TextSendMessage(text=event.message.text)
-    line_bot_api.reply_message(event.reply_token,message)
-
+    message = text=event.message.text
+    if re.match('告訴我秘密',message):
+        imagemap_message = ImagemapSendMessage(
+            base_url='https://i.imgur.com/xMUKNtn.jpg',
+            alt_text='組圖訊息',
+            base_size=BaseSize(height=2000, width=2000),
+            actions=[
+                URIImagemapAction(
+                    link_uri='https://en.wikipedia.org/wiki/Cebu',
+                    area=ImagemapArea(
+                        x=0, y=0, width=1000, height=1000
+                    )
+                ),
+                URIImagemapAction(
+                    link_uri='https://en.wikipedia.org/wiki/Taipei',
+                    area=ImagemapArea(
+                        x=1000, y=0, width=1000, height=1000
+                    )
+                ),
+                URIImagemapAction(
+                    link_uri='https://en.wikipedia.org/wiki/Osaka',
+                    area=ImagemapArea(
+                        x=0, y=1000, width=1000, height=1000
+                    )
+                ),
+                URIImagemapAction(
+                    link_uri='https://en.wikipedia.org/wiki/Shanghai',
+                    area=ImagemapArea(
+                        x=1000, y=1000, width=1000, height=1000
+                    )
+                )
+            ]
+        )
+        line_bot_api.reply_message(event.reply_token, imagemap_message)
+    else:
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(message))
 #主程式
 import os
 if __name__ == "__main__":
